@@ -1,0 +1,17 @@
+.center-filter-bar { flex-wrap: wrap; }
+.center-filter-bar label { min-width: 130px; }
+.center-filter-bar .center-search-field { flex-basis: 250px; }
+.center-filter-bar input { display: block; margin-top: 8px; width: 100%; border: 1px solid #dde4ef; padding: 10px; border-radius: 6px; background: white; color: #344762; font-size: 11px; }
+.center-metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 20px; }
+.center-metric-grid .metric-value { font-size: 27px; }
+.center-detail-link { color: #386dea; text-decoration: underline; text-underline-offset: 3px; }
+.center-detail-link strong { color: inherit; }
+.geography-link { padding: 0; color: #386dea; background: transparent; border: 0; font-size: 11px; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.back-link { display: inline-flex; gap: 8px; align-items: center; font-size: 12px; color: #386dea; margin-bottom: 22px; }
+.center-profile { margin: 0; }
+.center-profile > div { display: grid; grid-template-columns: 100px 1fr; gap: 10px; font-size: 12px; padding: 11px 0; border-bottom: 1px solid #eef2f7; }
+.center-profile dt { color: #8191a8; }
+.center-profile dd { margin: 0; color: #405776; line-height: 1.7; }
+.sidebar nav a[aria-current="page"] { background: #233c62; color: #fff; box-shadow: inset 3px 0 #6191ff; }
+@media (max-width: 1150px) { .center-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 550px) { .center-filter-bar label { flex-basis: 40%; min-width: 110px; } .center-filter-bar label:nth-child(3) { flex-basis: 40%; } .center-filter-bar .center-search-field { flex-basis: 100%; } .center-metric-grid .metric-value { font-size: 23px; } }

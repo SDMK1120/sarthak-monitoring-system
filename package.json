@@ -1,0 +1,40 @@
+{
+  "name": "sarthak-monitoring-system",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "setup:env": "node scripts/setup-env.mjs",
+    "dev": "npm run build -w @sarthak/shared && concurrently --kill-others -n shared,api,web \"npm run dev -w @sarthak/shared\" \"npm run dev -w @sarthak/api\" \"npm run dev -w @sarthak/web\"",
+    "build": "npm run build -w @sarthak/shared && npm run build -w @sarthak/api && npm run build -w @sarthak/web",
+    "typecheck": "npm run build -w @sarthak/shared && npm run typecheck --workspaces --if-present",
+    "test": "npm run build -w @sarthak/shared && npm run test --workspaces --if-present",
+    "check": "npm run typecheck && npm test && npm run build",
+    "test:browser": "playwright test",
+    "test:demo": "playwright test --config playwright.demo.config.ts",
+    "demo": "npm run setup:env && npm run build && npm run demo:serve",
+    "demo:serve": "concurrently --kill-others -n api,demo \"npm run start -w @sarthak/api\" \"npm run preview -w @sarthak/web\"",
+    "db:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
+    "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
+    "db:logs": "docker compose --env-file .env -f infra/docker-compose.yml logs -f postgres",
+    "db:config": "docker compose --env-file .env -f infra/docker-compose.yml config --quiet"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^20.19.0",
+    "concurrently": "^9.2.1",
+    "typescript": "7.0.2"
+  },
+  "overrides": {
+    "fastify": {
+      "light-my-request": "6.6.0"
+    }
+  }
+}
