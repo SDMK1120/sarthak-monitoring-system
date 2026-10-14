@@ -16,7 +16,9 @@
     "build": "npm run build -w @sarthak/shared && npm run build -w @sarthak/api && npm run build -w @sarthak/web",
     "typecheck": "npm run build -w @sarthak/shared && npm run typecheck --workspaces --if-present",
     "test": "npm run build -w @sarthak/shared && npm run test --workspaces --if-present",
-    "check": "npm run typecheck && npm test && npm run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run typecheck && npm test && npm run build",
     "test:browser": "playwright test",
     "test:demo": "playwright test --config playwright.demo.config.ts",
     "demo": "npm run setup:env && npm run build && npm run demo:serve",
@@ -30,6 +32,7 @@
     "@playwright/test": "^1.64.1",
     "@types/node": "^20.19.0",
     "concurrently": "^9.2.1",
+    "prettier": "3.9.10",
     "typescript": "7.0.2"
   },
   "overrides": {

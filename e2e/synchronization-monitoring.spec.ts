@@ -1,14 +1,24 @@
 import { expect, test } from '@playwright/test';
 
-test('health, failed transfers, timestamps, alerts and target detail preserve the snapshot', async ({ page }) => {
+test('health, failed transfers, timestamps, alerts and target detail preserve the snapshot', async ({
+  page,
+}) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   await page.getByRole('link', { name: 'Synchronization monitoring', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'View expected targets', exact: true })).toContainText('168');
-  await expect(page.getByRole('button', { name: 'View healthy targets', exact: true })).toContainText('32');
-  await expect(page.getByRole('button', { name: 'View degraded targets', exact: true })).toContainText('102');
-  await expect(page.getByRole('button', { name: 'View unknown targets', exact: true })).toContainText('34');
+  await expect(
+    page.getByRole('button', { name: 'View expected targets', exact: true }),
+  ).toContainText('168');
+  await expect(
+    page.getByRole('button', { name: 'View healthy targets', exact: true }),
+  ).toContainText('32');
+  await expect(
+    page.getByRole('button', { name: 'View degraded targets', exact: true }),
+  ).toContainText('102');
+  await expect(
+    page.getByRole('button', { name: 'View unknown targets', exact: true }),
+  ).toContainText('34');
   const listing = page.getByRole('table', { name: 'Synchronization target listing', exact: true });
   await expect(listing.getByRole('row')).toHaveCount(11);
   await page.getByRole('button', { name: 'Monitor failed transfers', exact: true }).click();
@@ -21,7 +31,9 @@ test('health, failed transfers, timestamps, alerts and target detail preserve th
   await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
   await expect(listing.getByRole('row')).toHaveCount(2);
   const originalUrl = page.url();
-  await expect(page.getByRole('table', { name: 'Synchronization alerts', exact: true })).toContainText('critical');
+  await expect(
+    page.getByRole('table', { name: 'Synchronization alerts', exact: true }),
+  ).toContainText('critical');
   await listing.getByRole('link', { name: 'target-2', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'target-2', exact: true })).toBeVisible();
   await expect(page.getByText('Last successful sync', { exact: true })).toBeVisible();
@@ -35,14 +47,20 @@ test('health, failed transfers, timestamps, alerts and target detail preserve th
   expect(errors).toEqual([]);
 });
 
-test('escalation preview validates, changes recommendations, paginates and leaves defaults unchanged', async ({ page, request }) => {
+test('escalation preview validates, changes recommendations, paginates and leaves defaults unchanged', async ({
+  page,
+  request,
+}) => {
   await page.goto('/synchronization?result=failed');
   await expect(page.getByLabel('SDM after hours', { exact: true })).toHaveValue('6');
   await page.getByLabel('SDM after hours', { exact: true }).fill('1');
   await page.getByRole('button', { name: 'Preview escalation', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('strictly increasing');
   await page.getByLabel('SDM after hours', { exact: true }).fill('3');
-  const responsePromise = page.waitForResponse((response) => response.request().method() === 'POST' && response.url().endsWith('/rules/evaluate'));
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' && response.url().endsWith('/rules/evaluate'),
+  );
   await page.getByRole('button', { name: 'Preview escalation', exact: true }).click();
   const response = await responsePromise;
   expect(response.status()).toBe(200);
@@ -67,10 +85,15 @@ test('escalation preview validates, changes recommendations, paginates and leave
 test('mobile target details and invalid query recovery', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/synchronization');
-  await expect(page.getByRole('button', { name: 'View expected targets', exact: true })).toContainText('168');
+  await expect(
+    page.getByRole('button', { name: 'View expected targets', exact: true }),
+  ).toContainText('168');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/synchronization-mobile.png', fullPage: true });
-  await page.getByRole('table', { name: 'Synchronization alerts', exact: true }).getByRole('link', { name: 'target-1', exact: true }).click();
+  await page
+    .getByRole('table', { name: 'Synchronization alerts', exact: true })
+    .getByRole('link', { name: 'target-1', exact: true })
+    .click();
   await expect(page.getByRole('heading', { name: 'target-1', exact: true })).toBeVisible();
   await expect(page.locator('dl').last()).toContainText('Evidence review');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -78,5 +101,7 @@ test('mobile target details and invalid query recovery', async ({ page }) => {
   await page.goto('/synchronization?page=0');
   await expect(page.getByRole('alert')).toContainText('invalid filters');
   await page.getByRole('button', { name: 'Reset filters', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'View expected targets', exact: true })).toContainText('168');
+  await expect(
+    page.getByRole('button', { name: 'View expected targets', exact: true }),
+  ).toContainText('168');
 });

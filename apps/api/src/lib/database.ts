@@ -8,7 +8,10 @@ export interface DatabaseConnection {
   close(): Promise<void>;
 }
 
-export function createDatabase(config: AppConfig, logger: Pick<FastifyBaseLogger, 'error'>): DatabaseConnection {
+export function createDatabase(
+  config: AppConfig,
+  logger: Pick<FastifyBaseLogger, 'error'>,
+): DatabaseConnection {
   const ca = config.DATABASE_CA_FILE ? readFileSync(config.DATABASE_CA_FILE, 'utf8') : undefined;
   const pool = new pg.Pool({
     connectionString: config.DATABASE_URL,
@@ -19,9 +22,18 @@ export function createDatabase(config: AppConfig, logger: Pick<FastifyBaseLogger
     ssl: config.DATABASE_TLS ? { rejectUnauthorized: true, ...(ca ? { ca } : {}) } : false,
   });
   // Prevent an idle connection failure becoming an unhandled EventEmitter error.
-  pool.on('error', () => logger.error({ event: 'database_idle_connection_failure' }, 'PostgreSQL idle connection failed'));
+  pool.on('error', () =>
+    logger.error(
+      { event: 'database_idle_connection_failure' },
+      'PostgreSQL idle connection failed',
+    ),
+  );
   return {
-    async check() { await pool.query('SELECT 1'); },
-    async close() { await pool.end(); },
+    async check() {
+      await pool.query('SELECT 1');
+    },
+    async close() {
+      await pool.end();
+    },
   };
 }

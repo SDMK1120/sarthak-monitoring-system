@@ -16,8 +16,12 @@ async function main(): Promise<void> {
       process.exitCode = 1;
     }
   };
-  process.once('SIGINT', () => { void shutdown(); });
-  process.once('SIGTERM', () => { void shutdown(); });
+  process.once('SIGINT', () => {
+    void shutdown();
+  });
+  process.once('SIGTERM', () => {
+    void shutdown();
+  });
   try {
     await app.listen({ host: config.HOST, port: config.PORT });
   } catch {
@@ -28,7 +32,10 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error && error.message.startsWith('Invalid environment configuration:')
-    ? error.message : 'API initialization failed; check environment configuration and CA file access.');
+  console.error(
+    error instanceof Error && error.message.startsWith('Invalid environment configuration:')
+      ? error.message
+      : 'API initialization failed; check environment configuration and CA file access.',
+  );
   process.exitCode = 1;
 });

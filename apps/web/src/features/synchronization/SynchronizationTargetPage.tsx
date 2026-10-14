@@ -2,21 +2,197 @@ import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { DashboardShell, Panel } from '../executive/components';
 import { RouteLink } from '../centers/navigation';
 import { useCenterRequest } from '../centers/useCenterRequest';
-import { getSynchronizationTarget, readSynchronizationQuery, synchronizationSearch } from './service';
+import {
+  getSynchronizationTarget,
+  readSynchronizationQuery,
+  synchronizationSearch,
+} from './service';
 import { syncTimestamp, SyncNotice, SyncRequestState } from './common';
 
 export function SynchronizationTargetPage({ targetId }: { targetId: string }) {
   const routeSearch = window.location.search;
   let back = '/synchronization';
-  try { back += synchronizationSearch(readSynchronizationQuery(routeSearch)); } catch { /* Request displays invalid context. */ }
+  try {
+    back += synchronizationSearch(readSynchronizationQuery(routeSearch));
+  } catch {
+    /* Request displays invalid context. */
+  }
   const request = useCenterRequest(async (signal) => {
     const query = readSynchronizationQuery(routeSearch);
     return getSynchronizationTarget(targetId, query.snapshot_id, signal);
   }, `${targetId}${routeSearch}`);
   const detail = request.data;
-  return <DashboardShell><main className="dashboard-main" id="synchronization-monitoring"><RouteLink className="back-link" href={back}><ArrowLeft size={15} />Back to synchronization</RouteLink><div className="page-heading"><div><p className="eyebrow">SYNCHRONIZATION / TARGET EVIDENCE</p><h1>{detail ? detail.target.id : 'Synchronization target'}</h1><p>{detail?.target.center_name ?? 'Inspect latest transfer and last successful synchronization evidence.'}</p></div><button type="button" className="secondary-button" aria-label="Refresh synchronization target" disabled={request.loading} onClick={request.retry}><RefreshCw size={16} />Refresh</button></div><SyncRequestState {...request} />
-    {detail && <><SyncNotice asOf={detail.context.data_as_of} /><Panel title="Target evidence" subtitle="Health, connectivity and latest transfer outcome are independent fields."><dl className="center-profile"><div><dt>Center</dt><dd><RouteLink className="center-detail-link" href={`/centers/${encodeURIComponent(detail.target.center_id)}?${new URLSearchParams({ snapshot_id: detail.context.snapshot_id })}`}>{detail.target.center_name}</RouteLink></dd></div><div><dt>Location</dt><dd>{detail.target.district_name} · {detail.target.region_name}</dd></div><div><dt>Health</dt><dd><span className={`status-pill ${detail.target.state}`}>{detail.target.state}</span> · {detail.target.reason}</dd></div><div><dt>Connectivity</dt><dd>{detail.target.connectivity}</dd></div><div><dt>Latest result</dt><dd>{detail.target.result ?? 'No result evidence'}</dd></div><div><dt>Last observation</dt><dd>{syncTimestamp(detail.target.latest_at)}</dd></div><div><dt>Last successful sync</dt><dd>{syncTimestamp(detail.target.last_success_at)}</dd></div><div><dt>Observation age</dt><dd>{detail.target.observation_age_hours === null ? 'Unknown' : `${detail.target.observation_age_hours.toFixed(2)} hours at snapshot`}</dd></div><div><dt>Success age</dt><dd>{detail.target.success_age_hours === null ? 'Unknown' : `${detail.target.success_age_hours.toFixed(2)} hours at snapshot`}</dd></div><div><dt>Delivery</dt><dd>{detail.target.delivery_complete === null ? 'Unknown evidence' : detail.target.delivery_complete ? 'Complete' : 'Incomplete'}</dd></div><div><dt>Publication</dt><dd>{detail.target.published === null ? 'Unknown evidence' : detail.target.published ? 'Published' : 'Unpublished'}</dd></div></dl><p className="chart-note">Synthetic cadence {detail.cadence_hours} hours; pending deadline {detail.pending_deadline_hours} hours. Timestamps are shown in IST. Missing timestamps do not establish a known failure or outage duration.</p></Panel>
-      <Panel title="Default-rule alert recommendation" subtitle="This detail uses default rules, including when opened from an unsaved preview. Recipient recommendation is not notification delivery.">{detail.alert ? <dl className="center-profile"><div><dt>Severity</dt><dd><span className={`status-pill ${detail.alert.severity}`}>{detail.alert.severity}</span></dd></div><div><dt>Cause</dt><dd>{detail.alert.cause.replaceAll('_', ' ')} · {detail.alert.reason}</dd></div><div><dt>Reference</dt><dd>{syncTimestamp(detail.alert.reference_at)}</dd></div><div><dt>Age</dt><dd>{detail.alert.age_hours === null ? 'Unknown' : `${detail.alert.age_hours.toFixed(2)} hours at snapshot`}</dd></div><div><dt>Recipient</dt><dd>{detail.alert.recommended_role ?? 'Evidence review'}</dd></div><div><dt>Recommendation</dt><dd>{detail.alert.recommendation}</dd></div></dl> : <p className="empty-message">No primary alert for this target at the fixed snapshot.</p>}</Panel>
-    </>}
-  </main></DashboardShell>;
+  return (
+    <DashboardShell>
+      <main className="dashboard-main" id="synchronization-monitoring">
+        <RouteLink className="back-link" href={back}>
+          <ArrowLeft size={15} />
+          Back to synchronization
+        </RouteLink>
+        <div className="page-heading">
+          <div>
+            <p className="eyebrow">SYNCHRONIZATION / TARGET EVIDENCE</p>
+            <h1>{detail ? detail.target.id : 'Synchronization target'}</h1>
+            <p>
+              {detail?.target.center_name ??
+                'Inspect latest transfer and last successful synchronization evidence.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="secondary-button"
+            aria-label="Refresh synchronization target"
+            disabled={request.loading}
+            onClick={request.retry}
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+        </div>
+        <SyncRequestState {...request} />
+        {detail && (
+          <>
+            <SyncNotice asOf={detail.context.data_as_of} />
+            <Panel
+              title="Target evidence"
+              subtitle="Health, connectivity and latest transfer outcome are independent fields."
+            >
+              <dl className="center-profile">
+                <div>
+                  <dt>Center</dt>
+                  <dd>
+                    <RouteLink
+                      className="center-detail-link"
+                      href={`/centers/${encodeURIComponent(detail.target.center_id)}?${new URLSearchParams({ snapshot_id: detail.context.snapshot_id })}`}
+                    >
+                      {detail.target.center_name}
+                    </RouteLink>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Location</dt>
+                  <dd>
+                    {detail.target.district_name} · {detail.target.region_name}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Health</dt>
+                  <dd>
+                    <span className={`status-pill ${detail.target.state}`}>
+                      {detail.target.state}
+                    </span>{' '}
+                    · {detail.target.reason}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Connectivity</dt>
+                  <dd>{detail.target.connectivity}</dd>
+                </div>
+                <div>
+                  <dt>Latest result</dt>
+                  <dd>{detail.target.result ?? 'No result evidence'}</dd>
+                </div>
+                <div>
+                  <dt>Last observation</dt>
+                  <dd>{syncTimestamp(detail.target.latest_at)}</dd>
+                </div>
+                <div>
+                  <dt>Last successful sync</dt>
+                  <dd>{syncTimestamp(detail.target.last_success_at)}</dd>
+                </div>
+                <div>
+                  <dt>Observation age</dt>
+                  <dd>
+                    {detail.target.observation_age_hours === null
+                      ? 'Unknown'
+                      : `${detail.target.observation_age_hours.toFixed(2)} hours at snapshot`}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Success age</dt>
+                  <dd>
+                    {detail.target.success_age_hours === null
+                      ? 'Unknown'
+                      : `${detail.target.success_age_hours.toFixed(2)} hours at snapshot`}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Delivery</dt>
+                  <dd>
+                    {detail.target.delivery_complete === null
+                      ? 'Unknown evidence'
+                      : detail.target.delivery_complete
+                        ? 'Complete'
+                        : 'Incomplete'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Publication</dt>
+                  <dd>
+                    {detail.target.published === null
+                      ? 'Unknown evidence'
+                      : detail.target.published
+                        ? 'Published'
+                        : 'Unpublished'}
+                  </dd>
+                </div>
+              </dl>
+              <p className="chart-note">
+                Synthetic cadence {detail.cadence_hours} hours; pending deadline{' '}
+                {detail.pending_deadline_hours} hours. Timestamps are shown in IST. Missing
+                timestamps do not establish a known failure or outage duration.
+              </p>
+            </Panel>
+            <Panel
+              title="Default-rule alert recommendation"
+              subtitle="This detail uses default rules, including when opened from an unsaved preview. Recipient recommendation is not notification delivery."
+            >
+              {detail.alert ? (
+                <dl className="center-profile">
+                  <div>
+                    <dt>Severity</dt>
+                    <dd>
+                      <span className={`status-pill ${detail.alert.severity}`}>
+                        {detail.alert.severity}
+                      </span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Cause</dt>
+                    <dd>
+                      {detail.alert.cause.replaceAll('_', ' ')} · {detail.alert.reason}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Reference</dt>
+                    <dd>{syncTimestamp(detail.alert.reference_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>Age</dt>
+                    <dd>
+                      {detail.alert.age_hours === null
+                        ? 'Unknown'
+                        : `${detail.alert.age_hours.toFixed(2)} hours at snapshot`}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Recipient</dt>
+                    <dd>{detail.alert.recommended_role ?? 'Evidence review'}</dd>
+                  </div>
+                  <div>
+                    <dt>Recommendation</dt>
+                    <dd>{detail.alert.recommendation}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="empty-message">
+                  No primary alert for this target at the fixed snapshot.
+                </p>
+              )}
+            </Panel>
+          </>
+        )}
+      </main>
+    </DashboardShell>
+  );
 }

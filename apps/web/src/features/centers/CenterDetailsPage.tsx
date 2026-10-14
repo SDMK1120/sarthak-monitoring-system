@@ -1,5 +1,13 @@
 import { ArrowLeft, Building2, CheckCircle2, Layers3, Radio, RefreshCw } from 'lucide-react';
-import { DashboardShell, dateLabel, MetricCard, number, Panel, percent, SectionHeading } from '../executive/components';
+import {
+  DashboardShell,
+  dateLabel,
+  MetricCard,
+  number,
+  Panel,
+  percent,
+  SectionHeading,
+} from '../executive/components';
 import { CenterContextNotice, CenterRequestState } from './common';
 import { RouteLink } from './navigation';
 import { centerSearch, getCenterDetail, readCenterQuery } from './service';
@@ -9,18 +17,313 @@ import { syncTimestamp } from '../synchronization/common';
 export function CenterDetailsPage({ centerId }: { centerId: string }) {
   const routeSearch = window.location.search;
   let returnPath = '/centers';
-  try { returnPath += centerSearch(readCenterQuery(routeSearch)); } catch { /* Invalid context is explained by the request state. */ }
+  try {
+    returnPath += centerSearch(readCenterQuery(routeSearch));
+  } catch {
+    /* Invalid context is explained by the request state. */
+  }
   const request = useCenterRequest(async (signal) => {
     const query = readCenterQuery(routeSearch);
     return getCenterDetail(centerId, query.snapshot_id, signal);
   }, `${centerId}${routeSearch}`);
   const detail = request.data;
-  return <DashboardShell><main className="dashboard-main" id="center-monitoring"><RouteLink className="back-link" href={returnPath}><ArrowLeft size={15} />Back to centers</RouteLink><div className="page-heading"><div><p className="eyebrow">CENTER MONITORING / CENTER DETAILS</p><h1>{detail?.profile.name ?? 'Center details'}</h1><p>{detail ? `${detail.profile.code} · ${detail.profile.district_name}, ${detail.profile.region_name}` : 'Inspect center profile, batch records and synchronization evidence.'}</p></div><button type="button" className="secondary-button" aria-label="Refresh center details" disabled={request.loading} onClick={request.retry}><RefreshCw size={16} />Refresh</button></div>
-    <CenterRequestState {...request} />
-    {detail && <><CenterContextNotice context={detail.context} /><div className="metric-grid center-metric-grid"><MetricCard label="Recorded activity" value={detail.profile.activity_status.charAt(0).toUpperCase() + detail.profile.activity_status.slice(1)} detail="Source classification, independent of sync" icon={<Building2 size={19} />} /><MetricCard label="Batch records" value={number(detail.profile.batch_count)} detail="All recorded batch creation dates" icon={<Layers3 size={19} />} /><MetricCard label="Batch utilization" value={percent(detail.batch_summary.utilization_percent)} detail={`${number(detail.batch_summary.occupied_seats)} seats / ${number(detail.batch_summary.capacity)} capacity`} icon={<CheckCircle2 size={19} />} tone="teal" /><MetricCard label="Sync health" value={percent(detail.sync_summary.health_percent)} detail={`${detail.sync_summary.healthy} healthy / ${detail.sync_summary.total} expected targets`} icon={<Radio size={19} />} tone="green" /></div>
-      <SectionHeading id="center-profile" number="01" title="Center profile & activity" subtitle="Recorded identity and history at the published snapshot" /><div className="two-panels"><Panel title="Center profile"><dl className="center-profile"><div><dt>Center code</dt><dd>{detail.profile.code}</dd></div><div><dt>Region</dt><dd>{detail.profile.region_name}</dd></div><div><dt>District</dt><dd>{detail.profile.district_name}</dd></div><div><dt>Onboarded</dt><dd>{dateLabel(detail.profile.onboarded_at)}</dd></div><div><dt>Activity</dt><dd><span className={`status-pill ${detail.profile.activity_status}`}>{detail.profile.activity_status}</span></dd></div><div><dt>Schemes</dt><dd>{detail.profile.schemes.map((scheme) => scheme.name).join(', ') || 'No recorded schemes'}</dd></div></dl><p className="chart-note">Centers can belong to several schemes. Batch records are attributed to the batch's own scheme.</p></Panel><Panel title="Recorded activity history" subtitle="Historical source classifications; unknown is not inactive."><div className="table-scroll"><table aria-label="Activity history"><thead><tr><th scope="col">Effective date</th><th scope="col">Activity</th></tr></thead><tbody>{detail.status_history.map((record) => <tr key={`${record.at}-${record.status}`}><td>{dateLabel(record.at)}</td><td><span className={`status-pill ${record.status}`}>{record.status}</span></td></tr>)}</tbody></table></div>{detail.status_history.length === 0 && <p className="empty-message">No activity history is recorded.</p>}</Panel></div>
-      <SectionHeading id="center-batches" number="02" title="Batch records & capacity" subtitle="All batch records; utilization uses comparable planned/running batches at the fixed snapshot" /><div className="batch-context"><span><strong>{detail.batch_summary.current}</strong> planned/running</span><span><strong>{detail.batch_summary.comparable}</strong> comparable</span><span><strong>{detail.batch_summary.excluded}</strong> excluded from utilization</span><span><strong>{number(detail.profile.enrollments)}</strong> recorded enrollments · not unique learners</span></div><Panel title="Center batches" subtitle="Historical completed batches remain visible, but do not contribute to current stock utilization."><div className="table-scroll"><table aria-label="Center batches"><thead><tr><th scope="col">Batch / scheme</th><th scope="col">Created</th><th scope="col">Started</th><th scope="col">Completed</th><th scope="col">Lifecycle</th><th scope="col">Enrollments</th><th scope="col">Occupied seats</th><th scope="col">Capacity</th></tr></thead><tbody>{detail.batches.map((batch) => <tr key={batch.id}><td><strong>{batch.id}</strong><span className="cell-secondary">{batch.scheme_name}</span></td><td>{dateLabel(batch.created_at)}</td><td>{dateLabel(batch.started_at)}</td><td>{batch.completed_at ? dateLabel(batch.completed_at) : '—'}</td><td><span className="status-pill">{batch.lifecycle}</span></td><td>{number(batch.enrollments)}</td><td>{number(batch.occupied_seats)}</td><td>{batch.capacity === null ? 'Unknown' : number(batch.capacity)}</td></tr>)}</tbody></table></div>{detail.batches.length === 0 && <p className="empty-message">No batch records are available for this center.</p>}<p className="chart-note">Missing or zero capacity and unknown seat eligibility are excluded from both utilization numerator and denominator. Rates may exceed 100% when occupancy exceeds capacity.</p></Panel>
-      <SectionHeading id="center-sync" number="03" title="Synchronization observations" subtitle="Expected targets, connectivity and delivery evidence are shown separately" /><div className="batch-context"><span><strong>{detail.sync_summary.healthy}</strong> healthy</span><span><strong>{detail.sync_summary.degraded}</strong> degraded</span><span><strong>{detail.sync_summary.unknown}</strong> unknown</span><span>Classification coverage <strong>{percent(detail.sync_summary.classification_percent)}</strong></span></div><Panel title="Synchronization targets" subtitle={`Demo cadence ${detail.sync_summary.cadence_hours} hours; pending deadline ${detail.sync_summary.pending_deadline_hours} hours. Offline connectivity alone is not a failure.`}><div className="table-scroll"><table aria-label="Synchronization targets"><thead><tr><th scope="col">Target</th><th scope="col">Connectivity</th><th scope="col">Health / reason</th><th scope="col">Latest observation</th><th scope="col">Last success</th><th scope="col">Delivery / publication</th></tr></thead><tbody>{detail.sync_targets.map((target) => <tr key={target.id}><td><RouteLink className="center-detail-link" href={`/synchronization/targets/${encodeURIComponent(target.id)}?${new URLSearchParams({ center_id: detail.profile.id, snapshot_id: detail.context.snapshot_id })}`}>{target.id}</RouteLink></td><td>{target.connectivity}</td><td><span className={`status-pill ${target.state}`}>{target.state}</span><span className="cell-secondary">{target.reason}</span></td><td>{target.latest_at ? syncTimestamp(target.latest_at) : 'No evidence'}<span className="cell-secondary">{target.result ?? 'Unknown result'}</span></td><td>{target.last_success_at ? syncTimestamp(target.last_success_at) : 'No evidence'}</td><td>{target.delivery_complete === null ? 'Unknown delivery' : target.delivery_complete ? 'Complete delivery' : 'Incomplete delivery'}<span className="cell-secondary">{target.published === null ? 'Unknown publication' : target.published ? 'Published' : 'Unpublished'}</span></td></tr>)}</tbody></table></div>{detail.sync_targets.length === 0 && <p className="empty-message">No expected synchronization targets are recorded.</p>}</Panel>
-    </>}
-  </main></DashboardShell>;
+  return (
+    <DashboardShell>
+      <main className="dashboard-main" id="center-monitoring">
+        <RouteLink className="back-link" href={returnPath}>
+          <ArrowLeft size={15} />
+          Back to centers
+        </RouteLink>
+        <div className="page-heading">
+          <div>
+            <p className="eyebrow">CENTER MONITORING / CENTER DETAILS</p>
+            <h1>{detail?.profile.name ?? 'Center details'}</h1>
+            <p>
+              {detail
+                ? `${detail.profile.code} · ${detail.profile.district_name}, ${detail.profile.region_name}`
+                : 'Inspect center profile, batch records and synchronization evidence.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="secondary-button"
+            aria-label="Refresh center details"
+            disabled={request.loading}
+            onClick={request.retry}
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+        </div>
+        <CenterRequestState {...request} />
+        {detail && (
+          <>
+            <CenterContextNotice context={detail.context} />
+            <div className="metric-grid center-metric-grid">
+              <MetricCard
+                label="Recorded activity"
+                value={
+                  detail.profile.activity_status.charAt(0).toUpperCase() +
+                  detail.profile.activity_status.slice(1)
+                }
+                detail="Source classification, independent of sync"
+                icon={<Building2 size={19} />}
+              />
+              <MetricCard
+                label="Batch records"
+                value={number(detail.profile.batch_count)}
+                detail="All recorded batch creation dates"
+                icon={<Layers3 size={19} />}
+              />
+              <MetricCard
+                label="Batch utilization"
+                value={percent(detail.batch_summary.utilization_percent)}
+                detail={`${number(detail.batch_summary.occupied_seats)} seats / ${number(detail.batch_summary.capacity)} capacity`}
+                icon={<CheckCircle2 size={19} />}
+                tone="teal"
+              />
+              <MetricCard
+                label="Sync health"
+                value={percent(detail.sync_summary.health_percent)}
+                detail={`${detail.sync_summary.healthy} healthy / ${detail.sync_summary.total} expected targets`}
+                icon={<Radio size={19} />}
+                tone="green"
+              />
+            </div>
+            <SectionHeading
+              id="center-profile"
+              number="01"
+              title="Center profile & activity"
+              subtitle="Recorded identity and history at the published snapshot"
+            />
+            <div className="two-panels">
+              <Panel title="Center profile">
+                <dl className="center-profile">
+                  <div>
+                    <dt>Center code</dt>
+                    <dd>{detail.profile.code}</dd>
+                  </div>
+                  <div>
+                    <dt>Region</dt>
+                    <dd>{detail.profile.region_name}</dd>
+                  </div>
+                  <div>
+                    <dt>District</dt>
+                    <dd>{detail.profile.district_name}</dd>
+                  </div>
+                  <div>
+                    <dt>Onboarded</dt>
+                    <dd>{dateLabel(detail.profile.onboarded_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>Activity</dt>
+                    <dd>
+                      <span className={`status-pill ${detail.profile.activity_status}`}>
+                        {detail.profile.activity_status}
+                      </span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Schemes</dt>
+                    <dd>
+                      {detail.profile.schemes.map((scheme) => scheme.name).join(', ') ||
+                        'No recorded schemes'}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="chart-note">
+                  Centers can belong to several schemes. Batch records are attributed to the batch's
+                  own scheme.
+                </p>
+              </Panel>
+              <Panel
+                title="Recorded activity history"
+                subtitle="Historical source classifications; unknown is not inactive."
+              >
+                <div className="table-scroll">
+                  <table aria-label="Activity history">
+                    <thead>
+                      <tr>
+                        <th scope="col">Effective date</th>
+                        <th scope="col">Activity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detail.status_history.map((record) => (
+                        <tr key={`${record.at}-${record.status}`}>
+                          <td>{dateLabel(record.at)}</td>
+                          <td>
+                            <span className={`status-pill ${record.status}`}>{record.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {detail.status_history.length === 0 && (
+                  <p className="empty-message">No activity history is recorded.</p>
+                )}
+              </Panel>
+            </div>
+            <SectionHeading
+              id="center-batches"
+              number="02"
+              title="Batch records & capacity"
+              subtitle="All batch records; utilization uses comparable planned/running batches at the fixed snapshot"
+            />
+            <div className="batch-context">
+              <span>
+                <strong>{detail.batch_summary.current}</strong> planned/running
+              </span>
+              <span>
+                <strong>{detail.batch_summary.comparable}</strong> comparable
+              </span>
+              <span>
+                <strong>{detail.batch_summary.excluded}</strong> excluded from utilization
+              </span>
+              <span>
+                <strong>{number(detail.profile.enrollments)}</strong> recorded enrollments · not
+                unique learners
+              </span>
+            </div>
+            <Panel
+              title="Center batches"
+              subtitle="Historical completed batches remain visible, but do not contribute to current stock utilization."
+            >
+              <div className="table-scroll">
+                <table aria-label="Center batches">
+                  <thead>
+                    <tr>
+                      <th scope="col">Batch / scheme</th>
+                      <th scope="col">Created</th>
+                      <th scope="col">Started</th>
+                      <th scope="col">Completed</th>
+                      <th scope="col">Lifecycle</th>
+                      <th scope="col">Enrollments</th>
+                      <th scope="col">Occupied seats</th>
+                      <th scope="col">Capacity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.batches.map((batch) => (
+                      <tr key={batch.id}>
+                        <td>
+                          <strong>{batch.id}</strong>
+                          <span className="cell-secondary">{batch.scheme_name}</span>
+                        </td>
+                        <td>{dateLabel(batch.created_at)}</td>
+                        <td>{dateLabel(batch.started_at)}</td>
+                        <td>{batch.completed_at ? dateLabel(batch.completed_at) : '—'}</td>
+                        <td>
+                          <span className="status-pill">{batch.lifecycle}</span>
+                        </td>
+                        <td>{number(batch.enrollments)}</td>
+                        <td>{number(batch.occupied_seats)}</td>
+                        <td>{batch.capacity === null ? 'Unknown' : number(batch.capacity)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {detail.batches.length === 0 && (
+                <p className="empty-message">No batch records are available for this center.</p>
+              )}
+              <p className="chart-note">
+                Missing or zero capacity and unknown seat eligibility are excluded from both
+                utilization numerator and denominator. Rates may exceed 100% when occupancy exceeds
+                capacity.
+              </p>
+            </Panel>
+            <SectionHeading
+              id="center-sync"
+              number="03"
+              title="Synchronization observations"
+              subtitle="Expected targets, connectivity and delivery evidence are shown separately"
+            />
+            <div className="batch-context">
+              <span>
+                <strong>{detail.sync_summary.healthy}</strong> healthy
+              </span>
+              <span>
+                <strong>{detail.sync_summary.degraded}</strong> degraded
+              </span>
+              <span>
+                <strong>{detail.sync_summary.unknown}</strong> unknown
+              </span>
+              <span>
+                Classification coverage{' '}
+                <strong>{percent(detail.sync_summary.classification_percent)}</strong>
+              </span>
+            </div>
+            <Panel
+              title="Synchronization targets"
+              subtitle={`Demo cadence ${detail.sync_summary.cadence_hours} hours; pending deadline ${detail.sync_summary.pending_deadline_hours} hours. Offline connectivity alone is not a failure.`}
+            >
+              <div className="table-scroll">
+                <table aria-label="Synchronization targets">
+                  <thead>
+                    <tr>
+                      <th scope="col">Target</th>
+                      <th scope="col">Connectivity</th>
+                      <th scope="col">Health / reason</th>
+                      <th scope="col">Latest observation</th>
+                      <th scope="col">Last success</th>
+                      <th scope="col">Delivery / publication</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.sync_targets.map((target) => (
+                      <tr key={target.id}>
+                        <td>
+                          <RouteLink
+                            className="center-detail-link"
+                            href={`/synchronization/targets/${encodeURIComponent(target.id)}?${new URLSearchParams({ center_id: detail.profile.id, snapshot_id: detail.context.snapshot_id })}`}
+                          >
+                            {target.id}
+                          </RouteLink>
+                        </td>
+                        <td>{target.connectivity}</td>
+                        <td>
+                          <span className={`status-pill ${target.state}`}>{target.state}</span>
+                          <span className="cell-secondary">{target.reason}</span>
+                        </td>
+                        <td>
+                          {target.latest_at ? syncTimestamp(target.latest_at) : 'No evidence'}
+                          <span className="cell-secondary">
+                            {target.result ?? 'Unknown result'}
+                          </span>
+                        </td>
+                        <td>
+                          {target.last_success_at
+                            ? syncTimestamp(target.last_success_at)
+                            : 'No evidence'}
+                        </td>
+                        <td>
+                          {target.delivery_complete === null
+                            ? 'Unknown delivery'
+                            : target.delivery_complete
+                              ? 'Complete delivery'
+                              : 'Incomplete delivery'}
+                          <span className="cell-secondary">
+                            {target.published === null
+                              ? 'Unknown publication'
+                              : target.published
+                                ? 'Published'
+                                : 'Unpublished'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {detail.sync_targets.length === 0 && (
+                <p className="empty-message">No expected synchronization targets are recorded.</p>
+              )}
+            </Panel>
+          </>
+        )}
+      </main>
+    </DashboardShell>
+  );
 }

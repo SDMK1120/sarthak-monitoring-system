@@ -107,7 +107,8 @@ The browser loads dashboard options and snapshot data through Vite's `/api` prox
 | npm run typecheck | Strict source and API test/config checks |
 | npm test | Shared build then API and frontend tests; no database required |
 | npm run build | Build shared ESM/declarations, API JavaScript and frontend assets in dependency order |
-| npm run check | Type checks, tests and production builds |
+| npm run format / format:check | Format / verify source and configuration with the pinned Prettier version |
+| npm run check | Formatting, type checks, tests and production builds |
 | npm run test:browser | Chromium integration tests; run npx playwright install chromium once; test runner owns development servers |
 | npm run test:demo | The same browser scenarios against compiled API/frontend on 3001/4173; runner builds, starts and stops the demonstration |
 | npm run start -w @sarthak/api | Run built Fastify output after build and environment setup |

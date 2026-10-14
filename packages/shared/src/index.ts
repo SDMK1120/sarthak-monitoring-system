@@ -3,8 +3,14 @@ export * from './centers.js';
 export * from './synchronization.js';
 
 export const errorCodes = [
-  'BAD_REQUEST', 'VALIDATION_ERROR', 'NOT_FOUND', 'CONFLICT',
-  'INTERNAL_ERROR', 'SERVICE_UNAVAILABLE', 'NETWORK_ERROR', 'INVALID_RESPONSE',
+  'BAD_REQUEST',
+  'VALIDATION_ERROR',
+  'NOT_FOUND',
+  'CONFLICT',
+  'INTERNAL_ERROR',
+  'SERVICE_UNAVAILABLE',
+  'NETWORK_ERROR',
+  'INVALID_RESPONSE',
 ] as const;
 
 export type ErrorCode = (typeof errorCodes)[number];
