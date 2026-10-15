@@ -15,6 +15,18 @@ This documentation includes planning/design records and implemented prototype gu
 
 Start here for a reproducible presentation, evidence-backed capability status, technical architecture and the decisions needed for the next stage.
 
+## Test documentation
+
+1. [Test plan](test-plan.md): scope, environments, independent fixture oracles, strategy, entry/exit criteria, ownership and execution records.
+2. [Test scenarios](test-scenarios.md): 23 scenarios spanning current monitoring and five future gates.
+3. [Detailed test cases](test-cases.md): 77 definitions with data, steps, expected results, priorities and existing-automation references.
+
+The original [validation brief](qa/validation-plan.md) is historical. Case definitions and automation references are distinct from current execution/pass evidence.
+
+## Repository-local agent catalogue
+
+The [local agent catalogue](../agents/README.md) contains the orchestrator, all 13 specialist roles, native Codex definitions, dependencies, task/handoff templates and historical delivery aliases. [AGENTS.md](../AGENTS.md) supplies shared repository instructions. These reusable definitions do not start background agents or imply that every role executed every phase.
+
 ## Phase 2 business and product documentation
 
 1. [Project overview](project-overview.md)
@@ -153,6 +165,9 @@ docs/
   future-roadmap.md
   known-assumptions.md
   presentation-talking-points.md
+  test-plan.md
+  test-scenarios.md
+  test-cases.md
   agents/
     agent-charters.md
   product/

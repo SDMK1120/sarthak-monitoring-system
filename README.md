@@ -22,4 +22,4 @@ Synchronization Monitoring at `/synchronization` adds target health, failed-tran
 
 Run `npm run format` to format source and configuration with Prettier, or `npm run format:check` to verify formatting. `npm run check` includes formatting, type checks, backend/frontend tests and builds. See [Executive Dashboard implementation](docs/executive-dashboard.md) and [environment setup](docs/getting-started.md) for contracts, metric semantics, configuration and testing.
 
-Start with the [documentation index](docs/README.md) and [overall project plan](docs/project-plan.md). The [agent charters](docs/agents/agent-charters.md) define the 13 specialized AI roles.
+Start with the [documentation index](docs/README.md) and [overall project plan](docs/project-plan.md). The [repository-local agent team](agents/README.md) provides the orchestrator, 13 specialist role guides, Codex definitions and delivery-name mappings. [AGENTS.md](AGENTS.md) is the shared project instruction entry point; the [initial agent charters](docs/agents/agent-charters.md) retain the original planning baseline.

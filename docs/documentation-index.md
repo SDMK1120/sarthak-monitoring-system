@@ -19,7 +19,16 @@
 | [Synchronization Monitoring](synchronization-monitoring.md) | Implemented target health, alerts, previews and six APIs |
 | [Repository overview](../README.md) / [documentation entry](README.md) | Starting links and current project scope |
 
-## Product and business design
+## Test planning and verification
+
+- [Test plan](test-plan.md): strategy, scope, fixtures, environments, entry/exit and execution reporting.
+- [Test scenarios](test-scenarios.md): 23 scenario definitions, including future implementation gates.
+- [Detailed test cases](test-cases.md): 77 reproducible definitions and links to existing automated assertions or documented manual/partial gaps.
+- [Historical validation brief](qa/validation-plan.md): original planning context.
+
+Definitions are not passing execution records; historical test counts and a fresh build's observed results must be reported separately.
+
+## Product and business requirements
 
 - [Project overview](project-overview.md), [business goals](business-goals.md), [product requirements](product-requirements.md), [MVP scope](mvp-scope.md), [business assumptions](assumptions.md).
 - [User personas](user-personas.md), [user stories](user-stories.md), [acceptance criteria](acceptance-criteria.md), [business workflows](business-workflows.md), [use cases](use-cases.md).
@@ -47,6 +56,7 @@ Current analytics use approved-for-demo synthetic policies only. Dedicated learn
 | Area | Documents |
 | --- | --- |
 | Overall execution | [Project plan](project-plan.md), [agent charters](agents/agent-charters.md) |
+| Repository-local agents | [Team catalogue](../agents/README.md), [workflow](../agents/workflow.md), [execution history](../agents/execution-history.md), [task template](../agents/task-template.md), [project instructions](../AGENTS.md) |
 | Governance | [Workflow](governance/workflow.md), [phase plan](governance/phase-plan.md), [registers](governance/registers.md) |
 | Documentation | [Documentation strategy](documentation/strategy.md) |
 | Product/requirements | [Product brief](product/product-brief.md), [requirements plan](requirements/requirements-plan.md) |

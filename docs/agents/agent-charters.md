@@ -1,5 +1,7 @@
 # Specialized AI agent charters
 
+**Historical planning baseline:** These charters record the original planning assignment. Current reusable role instructions and repository-local Codex definitions are in the [local agent catalogue](../../agents/README.md), with confirmed implementation assignments recorded in its execution history. The planning-only mandate below does not restrict later user-authorized implementation.
+
 All 13 roles operate under the project orchestrator. Their present mandate is planning. Implementation responsibilities describe future phases and do not authorize code generation now. Domain owners draft their deliverables, named reviewers check them, and the orchestrator resolves dependencies and maintains the consolidated baseline.
 
 ## Product Manager Agent

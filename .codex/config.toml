@@ -1,0 +1,4 @@
+# Project-local agent concurrency; model and permissions remain inherited.
+# This limit excludes the primary agent: at most three child threads plus the primary.
+[agents]
+max_concurrent_threads_per_session = 3

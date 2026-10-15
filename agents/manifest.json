@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "project": "Sarthak-Monitoring-System",
+  "description": "Repository-local role definitions reconstructed from project charters and delivery responsibilities; not an export of live agent sessions.",
+  "entrypoint": "AGENTS.md",
+  "workflow": "agents/workflow.md",
+  "task_template": "agents/task-template.md",
+  "agents": [
+    {
+      "id": "orchestrator",
+      "name": "Project Orchestrator Agent",
+      "prompt": "agents/roles/orchestrator.md",
+      "codex_file": ".codex/agents/orchestrator.toml"
+    },
+    {
+      "id": "product_manager",
+      "name": "Product Manager Agent",
+      "prompt": "agents/roles/product_manager.md",
+      "codex_file": ".codex/agents/product_manager.toml"
+    },
+    {
+      "id": "business_analyst",
+      "name": "Business Analyst Agent",
+      "prompt": "agents/roles/business_analyst.md",
+      "codex_file": ".codex/agents/business_analyst.toml"
+    },
+    {
+      "id": "solution_architect",
+      "name": "Solution Architect Agent",
+      "prompt": "agents/roles/solution_architect.md",
+      "codex_file": ".codex/agents/solution_architect.toml"
+    },
+    {
+      "id": "ui_ux",
+      "name": "UI/UX Agent",
+      "prompt": "agents/roles/ui_ux.md",
+      "codex_file": ".codex/agents/ui_ux.toml"
+    },
+    {
+      "id": "database_architect",
+      "name": "Database Architect Agent",
+      "prompt": "agents/roles/database_architect.md",
+      "codex_file": ".codex/agents/database_architect.toml"
+    },
+    {
+      "id": "backend",
+      "name": "Backend Agent",
+      "prompt": "agents/roles/backend.md",
+      "codex_file": ".codex/agents/backend.toml"
+    },
+    {
+      "id": "frontend",
+      "name": "Frontend Agent",
+      "prompt": "agents/roles/frontend.md",
+      "codex_file": ".codex/agents/frontend.toml"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics Agent",
+      "prompt": "agents/roles/analytics.md",
+      "codex_file": ".codex/agents/analytics.toml"
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting Agent",
+      "prompt": "agents/roles/reporting.md",
+      "codex_file": ".codex/agents/reporting.toml"
+    },
+    {
+      "id": "security",
+      "name": "Security Agent",
+      "prompt": "agents/roles/security.md",
+      "codex_file": ".codex/agents/security.toml"
+    },
+    {
+      "id": "qa",
+      "name": "QA Agent",
+      "prompt": "agents/roles/qa.md",
+      "codex_file": ".codex/agents/qa.toml"
+    },
+    {
+      "id": "devops",
+      "name": "DevOps Agent",
+      "prompt": "agents/roles/devops.md",
+      "codex_file": ".codex/agents/devops.toml"
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation Agent",
+      "prompt": "agents/roles/documentation.md",
+      "codex_file": ".codex/agents/documentation.toml"
+    }
+  ],
+  "aliases": [
+    {
+      "id": "executive_backend",
+      "canonical_role": "backend",
+      "codex_file": ".codex/agents/executive_backend.toml"
+    },
+    {
+      "id": "executive_frontend",
+      "canonical_role": "frontend",
+      "codex_file": ".codex/agents/executive_frontend.toml"
+    },
+    {
+      "id": "executive_qa",
+      "canonical_role": "qa",
+      "codex_file": ".codex/agents/executive_qa.toml"
+    },
+    {
+      "id": "architecture_phase",
+      "canonical_role": "solution_architect",
+      "codex_file": ".codex/agents/architecture_phase.toml"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Validation planning brief
 
+**Historical brief:** This records the original planning assignment. The current operational package is the [test plan](../test-plan.md), [test scenarios](../test-scenarios.md) and [detailed test cases](../test-cases.md). The original “no application tests executed” statement below refers to that planning phase; implemented automated tests and later review evidence now exist, but new documentation is not a fresh execution result.
+
 **Owner:** QA Agent. **Reviewers:** BA, Product Manager, Security, Analytics. **Status:** Proposed planning baseline. **Version:** 0.1. **Date:** 2026-10-14.
 
 No application tests have been executed. This brief defines future validation requirements; planning delivery checks only document completeness, consistency, scope, and links.
