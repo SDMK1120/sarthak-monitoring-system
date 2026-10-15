@@ -15,7 +15,11 @@ This documentation includes planning/design records and implemented prototype gu
 
 Start here for a reproducible presentation, evidence-backed capability status, technical architecture and the decisions needed for the next stage.
 
-## Test documentation
+## Conversation archive
+
+[Chat session exports](chat-exports/README.md) provides readable Markdown and structured JSON snapshots of recorded user/assistant messages. Historical chat claims are distinct from the current implementation and verification baseline.
+
+## QA documentation
 
 1. [Test plan](test-plan.md): scope, environments, independent fixture oracles, strategy, entry/exit criteria, ownership and execution records.
 2. [Test scenarios](test-scenarios.md): 23 scenarios spanning current monitoring and five future gates.

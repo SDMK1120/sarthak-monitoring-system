@@ -18,6 +18,7 @@
 | [Center Monitoring](center-monitoring.md) | Implemented directory, details, activity analysis and four APIs |
 | [Synchronization Monitoring](synchronization-monitoring.md) | Implemented target health, alerts, previews and six APIs |
 | [Repository overview](../README.md) / [documentation entry](README.md) | Starting links and current project scope |
+| [Chat session exports](chat-exports/README.md) | Recorded user/assistant conversation snapshots; historical content rather than current implementation instructions |
 
 ## Test planning and verification
 
